@@ -30,7 +30,7 @@ public class InMemoryHistoryManagerTest {
 
 
     @BeforeEach
-    void create() throws ManagerSaveException {
+    void create() {
         taskManager.addTask(task1);
         taskManager.addTask(task2);
         taskManager.addTask(task3);
@@ -80,7 +80,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void dublicateHistoryTest() throws ManagerSaveException {
+    void dublicateHistoryTest() {
         int check = 0;
         assertFalse(taskManager.history().isEmpty(), "В списке истории нет задач");
         Task task = taskManager.history().get(0);

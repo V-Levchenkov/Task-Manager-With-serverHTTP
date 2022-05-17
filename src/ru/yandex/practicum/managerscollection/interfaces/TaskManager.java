@@ -1,6 +1,5 @@
 package ru.yandex.practicum.managerscollection.interfaces;
 
-import ru.yandex.practicum.exception.ManagerSaveException;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
@@ -25,32 +24,34 @@ public interface TaskManager {
 
     void deleteAllSubtasks();
 
-    void addTask(Task task) throws ManagerSaveException;
+    void addTask(Task task);
 
-    void addEpic(Epic epic) throws ManagerSaveException;
+    void addEpic(Epic epic);
 
-    void addSubTask(Subtask subtask) throws ManagerSaveException;
+    void addSubTask(Subtask subtask);
 
-    Task getTaskById(Long id) throws ManagerSaveException;
+    Task getTaskById(Long id);
 
-    Epic getEpicById(Long id) throws ManagerSaveException;
+    Epic getEpicById(Long id);
 
-    Subtask getSubTaskById(Long id) throws ManagerSaveException;
+    Subtask getSubTaskById(Long id);
 
-    void deleteTask(Long id) throws ManagerSaveException;
+    void deleteTask(Long id);
 
-    void deleteEpic(Long id) throws ManagerSaveException;
+    void deleteEpic(Long id);
 
-    void deleteSubTask(Long id) throws ManagerSaveException;
+    void deleteSubTask(Long id);
 
-    void updateTask(Task task) throws ManagerSaveException;
+    void updateTask(Task task);
 
     void updateEpic(Epic epic);
 
-    void updateSubTask(Subtask subtask) throws ManagerSaveException;
+    void updateSubTask(Subtask subtask);
 
     HashMap<Long, Task> getTaskMap();
+
     HashMap<Long, Epic> getEpicMap();
+
     HashMap<Long, Subtask> getSubTaskMap();
 
     ArrayList<Task> getListTask();

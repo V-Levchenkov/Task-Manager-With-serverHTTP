@@ -13,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 
 
-public class FileBackedTasksManagerTest extends TaskManagerTest {
-    public FileBackedTasksManagerTest() throws ManagerSaveException {
+public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
+    public FileBackedTasksManagerTest() {
         super(new FileBackedTasksManager(new File("savedData.csv")));
     }
 
@@ -45,7 +45,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void addInFileTest() throws ManagerSaveException {
+    void addInFileTest() {
         assertTrue(fileBackedTasksManager.history().isEmpty(), "Список не пустой");
         assertTrue(fileBackedTasksManager.getAllTasks().isEmpty(), "Список не пустой");
         fileBackedTasksManager.addTask(task1);
@@ -102,7 +102,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest {
     }
 
     @Test
-    void loadFromFileTest() throws ManagerSaveException {
+    void loadFromFileTest() {
         assertFalse(fileBackedTasksManager1.history().isEmpty(), "Список истории пустой после загрузки из файла");
         assertFalse(fileBackedTasksManager1.getAllTasks().isEmpty(), "Список задач пустой после загрузки из файла");
         fileBackedTasksManager1.addTask(task1);

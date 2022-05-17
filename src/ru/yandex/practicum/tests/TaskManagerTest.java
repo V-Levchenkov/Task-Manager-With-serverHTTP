@@ -31,7 +31,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
 
     @Test
-    void addTaskTest() throws ManagerSaveException {
+    void addTaskTest() {
         taskManager.addTask(task1);
         assertEquals(task1, taskManager.getTaskMap().get(task1.getTaskId()));
         assertNotNull(taskManager.getTaskMap(), "Задачи на возвращаются.");
@@ -44,7 +44,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void addEpicTest() throws ManagerSaveException {
+    void addEpicTest() {
         taskManager.addEpic(epic1);
         assertEquals(epic1, taskManager.getEpicMap().get(epic1.getTaskId()));
 
@@ -54,7 +54,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void addSubTaskTest() throws ManagerSaveException {
+    void addSubTaskTest() {
         taskManager.addEpic(epic1);
         subTask1.setEpicId(epic1.getTaskId());
         taskManager.addSubTask(subTask1);
@@ -71,7 +71,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void GetTaskTest() throws ManagerSaveException {
+    public void GetTaskTest() {
         taskManager.addTask(task1);
         NullPointerException ex1 = assertThrows(NullPointerException.class, () -> taskManager.getTaskById(null));
         assertEquals("запрошенный null = 0", ex1.getMessage());
@@ -90,7 +90,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void GetEpicTest() throws ManagerSaveException {
+    public void GetEpicTest() {
         taskManager.addEpic(epic1);
         NullPointerException ex1 = assertThrows(NullPointerException.class, () -> taskManager.getEpicById(null));
         assertEquals("запрошенный idEpicTask = null", ex1.getMessage());
@@ -109,7 +109,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void getSubTaskTest() throws ManagerSaveException {
+    public void getSubTaskTest() {
         taskManager.addEpic(epic1);
         subTask1.setEpicId(epic1.getTaskId());
         taskManager.addSubTask(subTask1);
@@ -130,7 +130,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void updateTaskTest() throws ManagerSaveException {
+    void updateTaskTest() {
         Task task = new Task();
         NullPointerException ex = assertThrows(NullPointerException.class, () -> taskManager.updateTask(task));
         assertEquals("task = null", ex.getMessage());
@@ -142,7 +142,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void updateSubTaskTest() throws ManagerSaveException {
+    void updateSubTaskTest() {
         Subtask subTask = new Subtask();
         NullPointerException ex = assertThrows(NullPointerException.class, () -> taskManager.updateSubTask(subTask));
         assertEquals("subTask = null", ex.getMessage());
@@ -179,7 +179,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getListSubTaskFromEpicTest() throws ManagerSaveException {
+    void getListSubTaskFromEpicTest() {
         taskManager.addEpic(epic1);
         subTask1.setEpicId(epic1.getTaskId());
         subTask2.setEpicId(epic1.getTaskId());
@@ -200,7 +200,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getListTaskTest() throws ManagerSaveException {
+    void getListTaskTest() {
         assertTrue(taskManager.getListTask().isEmpty(), "Список не пустой");
         taskManager.addTask(task1);
         taskManager.addTask(task2);
@@ -209,7 +209,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getListEpicTest() throws ManagerSaveException {
+    void getListEpicTest() {
         assertTrue(taskManager.getListEpic().isEmpty(), "Список не пустой");
         taskManager.addEpic(epic1);
         taskManager.addEpic(epic2);
@@ -218,7 +218,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void GetHistoryTest() throws ManagerSaveException {
+    void GetHistoryTest() {
         assertTrue(taskManager.history().isEmpty(), "Список не пустой");
         taskManager.addTask(task1);
         taskManager.addTask(task2);
@@ -267,7 +267,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getTaskTest() throws ManagerSaveException {
+    void getTaskTest() {
         assertTrue(taskManager.getTaskMap().isEmpty(), "tasks не пустой");
         taskManager.addTask(task1);
         taskManager.addTask(task2);
@@ -276,7 +276,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getEpicTest() throws ManagerSaveException {
+    void getEpicTest() {
         assertTrue(taskManager.getEpicMap().isEmpty(), "epics не пустой");
         taskManager.addEpic(epic1);
         taskManager.addEpic(epic2);
@@ -286,7 +286,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getSubTasksTest() throws ManagerSaveException {
+    void getSubTasksTest() {
         assertTrue(taskManager.getSubTaskMap().isEmpty(), "subTasks не пустой");
         taskManager.addEpic(epic1);
         subTask1.setEpicId(epic1.getTaskId());
@@ -308,7 +308,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getAllTasksTest() throws ManagerSaveException {
+    void getAllTasksTest() {
         assertTrue(taskManager.getAllTasks().isEmpty(), "Список не пустой");
         taskManager.addTask(task1);
         taskManager.addTask(task2);

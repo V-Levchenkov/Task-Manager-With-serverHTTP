@@ -1,6 +1,6 @@
 package ru.yandex.practicum.managerscollection;
 
-import ru.yandex.practicum.exception.ManagerSaveException;
+
 import ru.yandex.practicum.managerscollection.interfaces.HistoryManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskStatus;
@@ -21,7 +21,7 @@ import static ru.yandex.praktikum.utils.CSVutil.splitter;
 
 
 class Main {
-    public static void main(String[] args) throws ManagerSaveException {
+    public static void main(String[] args) throws FileBackedTasksManager.ManagerSaveException {
 
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(new File("savedData.csv"));
 
@@ -274,5 +274,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void deleteSubTask(Long id) throws ManagerSaveException {
         super.deleteSubTask(id);
         save();
+    }
+    public class ManagerSaveException extends RuntimeException {
+
+        public ManagerSaveException(String message, Throwable cause) {
+            super(message, cause);
+        }
     }
 }
