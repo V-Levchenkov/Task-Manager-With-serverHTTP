@@ -1,12 +1,8 @@
-package ru.yandex.practicum.main;
+package ru.yandex.practicum.managerscollection.main;
 
-import com.sun.source.tree.NewArrayTree;
-import ru.yandex.practicum.exception.ManagerSaveException;
 import ru.yandex.practicum.managerscollection.FileBackedTasksManager;
 import ru.yandex.practicum.managerscollection.Managers;
-import ru.yandex.practicum.managerscollection.interfaces.HistoryManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskManager;
-import ru.yandex.practicum.managerscollection.interfaces.TypeTask;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
@@ -16,7 +12,7 @@ import java.io.File;
 import static ru.yandex.practicum.managerscollection.interfaces.TaskStatus.NEW;
 
 public class Main {
-    public static void main(String[] args) throws ManagerSaveException {
+    public static void main(String[] args) {
 
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(new File("savedData.csv"));
         TaskManager manager = Managers.getDefault();

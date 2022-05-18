@@ -1,6 +1,5 @@
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.exception.ManagerSaveException;
 import ru.yandex.practicum.managerscollection.InMemoryTaskManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskStatus;
 import ru.yandex.practicum.tasks.Epic;
@@ -18,27 +17,27 @@ class EpicTaskUpdateStatusTest {
     private final Subtask subTask4 = new Subtask("sub4", "desc", TaskStatus.NEW, epic1.getTaskId());
 
     @BeforeAll
-    static void emptyListIdSubTaskTest() throws ManagerSaveException {
+    static void emptyListIdSubTaskTest() {
         inMemoryTaskManager.addEpic(epic1);
         assertEquals(TaskStatus.NEW, epic1.getStatus());
     }
 
     @Test
-    public void newStatusEpicTest() throws ManagerSaveException {
+    public void newStatusEpicTest() {
         inMemoryTaskManager.addSubTask(subTask1);
         assertEquals(TaskStatus.NEW, epic1.getStatus());
         inMemoryTaskManager.deleteSubTask(subTask1.getTaskId());
     }
 
     @Test
-    public void inProgressStatusEpicTest() throws ManagerSaveException {
+    public void inProgressStatusEpicTest() {
         inMemoryTaskManager.addSubTask(subTask3);
         assertEquals(TaskStatus.IN_PROGRESS, epic1.getStatus());
         inMemoryTaskManager.deleteSubTask(subTask3.getTaskId());
     }
 
     @Test
-    public void doneStatusEpicTest() throws ManagerSaveException {
+    public void doneStatusEpicTest() {
         inMemoryTaskManager.addSubTask(subTask2);
         assertEquals(TaskStatus.DONE, epic1.getStatus());
         inMemoryTaskManager.addSubTask(subTask1);
@@ -50,7 +49,7 @@ class EpicTaskUpdateStatusTest {
     }
 
     @Test
-    public void doneStatusEpicTest2() throws ManagerSaveException {
+    public void doneStatusEpicTest2() {
         inMemoryTaskManager.addSubTask(subTask1);
         inMemoryTaskManager.addSubTask(subTask2);
         inMemoryTaskManager.addSubTask(subTask3);
@@ -64,7 +63,7 @@ class EpicTaskUpdateStatusTest {
     }
 
     @Test
-    public void inProgressStatusEpicTest3() throws ManagerSaveException {
+    public void inProgressStatusEpicTest3() {
         inMemoryTaskManager.addSubTask(subTask1);
         inMemoryTaskManager.addSubTask(subTask2);
         inMemoryTaskManager.addSubTask(subTask3);
@@ -78,7 +77,7 @@ class EpicTaskUpdateStatusTest {
     }
 
     @Test
-    public void newStatusEpicTest2() throws ManagerSaveException {
+    public void newStatusEpicTest2() {
         inMemoryTaskManager.addSubTask(subTask1);
         inMemoryTaskManager.addSubTask(subTask2);
         inMemoryTaskManager.addSubTask(subTask3);

@@ -1,6 +1,5 @@
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.exception.ManagerSaveException;
 import ru.yandex.practicum.managerscollection.FileBackedTasksManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskStatus;
 import ru.yandex.practicum.tasks.Epic;
@@ -40,7 +39,7 @@ public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksM
     void emptyFileNameTest() {
         final Task task10 = new Task("Test Task1", "Test description1");
         FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(new File(""));
-        ManagerSaveException ex = assertThrows(ManagerSaveException.class, () -> fileBackedTasksManager1.addTask(task10));
+        FileBackedTasksManager.ManagerSaveException ex = assertThrows(FileBackedTasksManager.ManagerSaveException.class, () -> fileBackedTasksManager1.addTask(task10));
         assertEquals("Произошла ошибка во время записи в файл.", ex.getMessage());
     }
 

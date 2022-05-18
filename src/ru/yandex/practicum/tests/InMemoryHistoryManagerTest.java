@@ -1,7 +1,6 @@
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.exception.ManagerSaveException;
 import ru.yandex.practicum.managerscollection.InMemoryTaskManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskStatus;
 import ru.yandex.practicum.tasks.Epic;

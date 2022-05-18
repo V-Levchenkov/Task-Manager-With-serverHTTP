@@ -21,7 +21,7 @@ import static ru.yandex.praktikum.utils.CSVutil.splitter;
 
 
 class Main {
-    public static void main(String[] args) throws FileBackedTasksManager.ManagerSaveException {
+    public static void main(String[] args) {
 
         FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(new File("savedData.csv"));
 
@@ -207,13 +207,13 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
 
     @Override
-    public void addTask(Task task) throws ManagerSaveException { // создание задачи
+    public void addTask(Task task) { // создание задачи
         super.addTask(task);
         save();
     }
 
     @Override
-    public Task getTaskById(Long id) throws ManagerSaveException {  // получение задачи по id
+    public Task getTaskById(Long id){  // получение задачи по id
         final Task result = super.getTaskById(id);
         save();
         return result;
@@ -221,24 +221,24 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
 
     @Override
-    public void updateTask(Task task) throws ManagerSaveException {
+    public void updateTask(Task task) {
         super.updateTask(task);
         save();
     }
 
     @Override
-    public void addEpic(Epic epic) throws ManagerSaveException {
+    public void addEpic(Epic epic) {
         super.addEpic(epic);
         save();
     }
     @Override
-    public void addSubTask(Subtask subtask) throws ManagerSaveException {
+    public void addSubTask(Subtask subtask) {
         super.addSubTask(subtask);
         save();
     }
 
     @Override
-    public Epic getEpicById(Long id) throws ManagerSaveException {
+    public Epic getEpicById(Long id) {
         final Epic result = super.getEpicById(id);
         save();
         return result;
@@ -246,32 +246,32 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
 
 
     @Override
-    public Subtask getSubTaskById(Long id) throws ManagerSaveException {
+    public Subtask getSubTaskById(Long id) {
         final Subtask result = super.getSubTaskById(id);
         save();
         return result;
     }
 
     @Override
-    public void updateSubTask(Subtask subtask) throws ManagerSaveException {
+    public void updateSubTask(Subtask subtask) {
         super.updateSubTask(subtask);
         save();
     }
 
     @Override
-    public void deleteTask(Long id) throws ManagerSaveException {
+    public void deleteTask(Long id) {
         super.deleteTask(id);
         save();
     }
 
     @Override
-    public void deleteEpic(Long id) throws ManagerSaveException {
+    public void deleteEpic(Long id) {
         super.deleteEpic(id);
         save();
     }
 
     @Override
-    public void deleteSubTask(Long id) throws ManagerSaveException {
+    public void deleteSubTask(Long id) {
         super.deleteSubTask(id);
         save();
     }
