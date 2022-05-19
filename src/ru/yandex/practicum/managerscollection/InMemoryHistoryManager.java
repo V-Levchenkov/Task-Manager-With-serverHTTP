@@ -33,7 +33,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void remove(long id) {
+    public void remove(Long id) {
         if (nodeMap.containsKey(id)) {
             Node node = nodeMap.get(id);
             Task task = node.getTask();

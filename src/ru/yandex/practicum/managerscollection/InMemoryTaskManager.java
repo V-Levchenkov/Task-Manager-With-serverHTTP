@@ -27,7 +27,7 @@ public class InMemoryTaskManager implements TaskManager {
         historyList = historyManager.getHistory();
         return historyList;
     }
-
+    @Override
     public TreeSet<Task> getPrioritizedTasks() {
         return prioritizedTasks;
     }
@@ -50,7 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
         return true;
     }
 
-    private void setEpicTime(Epic epic) {  //----расчёт startTime,endTime,duration
+    private void setEpicTime(Epic epic) {
         TreeSet<Task> subtaskInEpic = new TreeSet<>();
         Subtask subtask = new Subtask();
         if (!epic.getSubTaskId().isEmpty()) {
@@ -73,6 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setEpicEndTime(null);
         }
     }
+
 
     public void addInDateList(Task task) {
         if (checkAddTime(task)) {
@@ -240,6 +241,11 @@ public class InMemoryTaskManager implements TaskManager {
             epics.remove(id);
             historyManager.remove(id);
         }
+    }
+
+    @Override
+    public void deleteFromHistory(Long id) {
+        historyManager.remove(id);
     }
 
     @Override

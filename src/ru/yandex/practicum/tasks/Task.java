@@ -10,6 +10,9 @@ import static ru.yandex.praktikum.utils.CSVutil.splitter;
 
 public class Task implements Comparable<Task> {
     protected String taskName;
+
+
+    protected TypeTask typeTask;
     protected String taskDescription;
     protected Long taskId;
     private int duration;
@@ -54,8 +57,11 @@ public class Task implements Comparable<Task> {
         this.taskId = taskId;
     }
 
+    public Task(Long taskId, String name, String taskDescription, TaskStatus status, String startTime, String duration) {
+        this.status = TaskStatus.NEW;
+    }
+
     public Task() {
-        status = TaskStatus.NEW;
     }
 
     public int getDuration() {
@@ -82,6 +88,10 @@ public class Task implements Comparable<Task> {
         this.status = status;
     }
 
+    public TypeTask getTypeTask() {
+        return typeTask;
+    }
+
     public String getTaskName() {
         return taskName;
     }
@@ -94,7 +104,7 @@ public class Task implements Comparable<Task> {
         return status;
     }
 
-    public void setTaskId(long taskId) {
+    public void setTaskId(Long taskId) {
         this.taskId = taskId;
     }
 

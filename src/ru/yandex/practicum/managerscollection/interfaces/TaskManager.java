@@ -4,9 +4,7 @@ import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Subtask;
 import ru.yandex.practicum.tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public interface TaskManager {
 
@@ -39,6 +37,7 @@ public interface TaskManager {
     void deleteTask(Long id);
 
     void deleteEpic(Long id);
+    void deleteFromHistory(Long id);
 
     void deleteSubTask(Long id);
 
@@ -61,4 +60,6 @@ public interface TaskManager {
     ArrayList<Task> getAllTasks();
 
     ArrayList<Subtask> getListSubTaskFromEpic(Long idEpicTask);
+
+    TreeSet<Task> getPrioritizedTasks();
 }

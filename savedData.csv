@@ -1,5 +1,5 @@
 taskId;type;name;status;description;startTime;duration;endTime;epic
-1;Epic;Test epicTask1;NEW;Test description4;null;0;null
-2;Epic;Test epicTask2;NEW;Test description5;null;0;null
-3;Epic;Test epicTask3;NEW;Test description6;null;0;null
+1;Task;Задача №1;NEW;Описание задачи №1 ;null;0;null
+2;Task;Задача №2;NEW;Описание задачи №2 ;null;0;null
  
+1,2

@@ -20,56 +20,13 @@ import java.util.List;
 import static ru.yandex.praktikum.utils.CSVutil.splitter;
 
 
-class Main {
-    public static void main(String[] args) {
-
-        FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(new File("savedData.csv"));
-
-
-        Task task1 = new Task("Задача №1", "Описание задачи №1 ", TaskStatus.NEW);
-        fileBackedTasksManager.addTask(task1);
-
-        Task task2 = new Task("Задача №2", "Описание задачи №2 ", TaskStatus.NEW);
-        fileBackedTasksManager.addTask(task2);
-
-        // Создаем 2 эпика, первый в 3-мя подзадачами
-        Epic epic1 = new Epic("Убраться в квартире", "Пропылесосить", TaskStatus.NEW);
-        fileBackedTasksManager.addEpic(epic1);
-
-        Subtask subtask1 = new Subtask("Сделать уборку на балконе", "Протереть окна", TaskStatus.NEW, (epic1.getTaskId()));
-        fileBackedTasksManager.addSubTask(subtask1);
-
-        Subtask subtask2 = new Subtask("Сделать уборку в гардеробной", "Разобрать вещи", TaskStatus.NEW, (epic1.getTaskId()));
-        fileBackedTasksManager.addSubTask(subtask2);
-
-        Subtask subtask3 = new Subtask("Сделать уборку на убраться в спальне", "Помыть окна", TaskStatus.NEW, (epic1.getTaskId()));
-        fileBackedTasksManager.addSubTask(subtask3);
-
-
-
-        // Второй без подзадач
-        Epic epic2 = new Epic("Помыть машину", "Нужна химчистка багажника", TaskStatus.NEW);
-        fileBackedTasksManager.addEpic(epic2);
-        System.out.println("\n");
-        // Последовательная история вызова
-        fileBackedTasksManager.getTaskById(1L);
-        fileBackedTasksManager.getTaskById(2L);
-        fileBackedTasksManager.getEpicById(3L);
-        fileBackedTasksManager.getSubTaskById(6L);
-        fileBackedTasksManager.getSubTaskById(5L);
-        fileBackedTasksManager.getSubTaskById(4L);
-        fileBackedTasksManager.getEpicById(7L);
-        System.out.println("Последовательная история вызова: " + fileBackedTasksManager.history());
-
-    }
-}
-
 public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
     private final File fileName;// путь к файлу сохранения задач
 
     public FileBackedTasksManager(File fileName) {
         this.fileName = fileName;
     }
+
     public static FileBackedTasksManager loadFromFile(File file) throws ManagerSaveException {
         final FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
         fileBackedTasksManager.readFile();
@@ -268,6 +225,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void deleteEpic(Long id) {
         super.deleteEpic(id);
         save();
+    }
+
+    @Override
+    public void deleteFromHistory(Long id) {
+        super.deleteFromHistory(id);
     }
 
     @Override

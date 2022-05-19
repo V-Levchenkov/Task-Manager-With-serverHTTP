@@ -5,6 +5,7 @@ import ru.yandex.practicum.managerscollection.interfaces.TypeTask;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import static ru.yandex.praktikum.utils.CSVutil.splitter;
 
@@ -18,9 +19,11 @@ public class Epic extends Task {
         this.epicEndTime = epicEndTime;
     }
 
+
     public Epic(String taskName, String taskDescription, TaskStatus status, Long epicId) {
         super(taskName, taskDescription, status, epicId);
     }
+
     public Epic(String taskName, String taskDescription, TaskStatus status) {
         super(taskName, taskDescription, status);
     }
@@ -28,13 +31,22 @@ public class Epic extends Task {
     public Epic(String nameTask, String description) {
         super(nameTask, description);
     }
-
     public Epic() {
     }
+
+    public Epic(Long epicId, String taskName, String taskDescription, TaskStatus status, String startTime, String endTime) {
+    }
+
 
     public void setIdSubTasks(Long subTaskId) {
         this.subTaskId.add(subTaskId);
     }
+
+    public ArrayList<Long> setIdSubTaskIdList(List<Long> subTaskIdList) {
+        subTaskId = (ArrayList<Long>) subTaskIdList;
+        return subTaskId;
+    }
+
     public LocalDateTime getEpicEndTime() {
         return epicEndTime;
     }
