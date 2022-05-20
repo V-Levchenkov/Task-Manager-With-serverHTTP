@@ -121,57 +121,57 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void getTaskByUinWithEmptyTasksList() {
+    public void getTaskByIdWithEmptyTasksList() {
         assertNull(emptyManager.getTaskById(3));
         assertEquals(emptyManager.history().size(), 0);
     }
 
     @Test
-    public void getTaskByUinWithFilledTasksList() {
+    public void getTaskByIdWithFilledTasksList() {
         assertEquals(filledManager.getTaskById(1).toString(), taskTestString);
         assertEquals(filledManager.history().get(0).getTaskId(), 1);
     }
 
     @Test
-    public void getTaskByUinWithIncorrectUin() {
+    public void getTaskByIdWithIncorrectUin() {
         int i = filledManager.history().size();
         assertNull(filledManager.getTaskById(100500));
         assertEquals(i, filledManager.history().size()); //история не меняется
     }
 
     @Test
-    public void getEpicByUinWithEmptyEpicsList() {
+    public void getEpicByIdWithEmptyEpicsList() {
         assertNull(emptyManager.getTaskById(3));
         assertEquals(emptyManager.history().size(), 0);
     }
 
     @Test
-    public void getEpicByUinWithFilledTasksList() {
+    public void getEpicByIdWithFilledTasksList() {
         assertEquals(filledManager.getEpicById(2).toString(), epic1TestString);
         assertEquals(filledManager.history().size(), 1);
     }
 
     @Test
-    public void getEpicByUinWithIncorrectUin() {
+    public void getEpicByIdWithIncorrectUin() {
         int i = filledManager.history().size();
         assertNull(filledManager.getTaskById(100500));
         assertEquals(filledManager.history().size(), i);
     }
 
     @Test
-    public void getSubTaskByUinWithEmptyTasksList() {
+    public void getSubTaskByIdWithEmptyTasksList() {
         assertNull(emptyManager.getSubTaskById(2));
         assertEquals(emptyManager.history().size(), 0);
     }
 
     @Test
-    public void getSubTaskByUinWithFilledTasksList() {
+    public void getSubTaskByIdWithFilledTasksList() {
         assertEquals(filledManager.getSubTaskById(3).toString(), subTask11TestString);
         assertEquals(filledManager.history().get(0).getTaskId(), 3);
     }
 
     @Test
-    public void getSubTaskByUinWithIncorrectUin() {
+    public void getSubTaskByIdWithIncorrectUin() {
         assertNull(filledManager.getSubTaskById(100500));
         assertEquals(filledManager.history().size(), 0);
     }
@@ -457,12 +457,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getTaskUniversalIfTaskListsAreEmpty() {
+    void getAllTasksByIdIfTaskListsAreEmpty() {
         assertNull(emptyManager.getAllTasksById(1));
     }
 
     @Test
-    void getTaskUniversalIfWrongId() {
+    void getAllTasksByIdIfWrongId() {
         assertNull(filledManager.getAllTasksById(100500));
     }
 
