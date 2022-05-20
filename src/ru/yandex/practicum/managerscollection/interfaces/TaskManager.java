@@ -1,65 +1,65 @@
 package ru.yandex.practicum.managerscollection.interfaces;
 
+import ru.yandex.practicum.managerscollection.exception.ManagerSaveException;
 import ru.yandex.practicum.tasks.Epic;
-import ru.yandex.practicum.tasks.Subtask;
+import ru.yandex.practicum.tasks.SubTask;
 import ru.yandex.practicum.tasks.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public interface TaskManager {
+    ArrayList<Epic> getAllEpicsList();
 
-    List<Task> history();
+    ArrayList<Task> getAllTasksList();
 
-    long addId();
+    ArrayList<SubTask> getAllSubTasksList();
 
-    long getId();
+    void clearTasks();
 
-    void deleteAll();
+    void clearEpics();
 
-    void deleteAllTasks();
+    void clearSubTasks();
 
-    void deleteAllEpics();
+    Task getTaskById(long id);
 
-    void deleteAllSubtasks();
+    Task getSubTaskById(long id);
 
-    void addTask(Task task);
+    Task getEpicById(long id);
 
-    void addEpic(Epic epic);
+    void addTask(Task task) throws ManagerSaveException;
 
-    void addSubTask(Subtask subtask);
+    void addSubTask(SubTask subtask, long epicId) throws ManagerSaveException;
 
-    Task getTaskById(Long id);
-
-    Epic getEpicById(Long id);
-
-    Subtask getSubTaskById(Long id);
-
-    void deleteTask(Long id);
-
-    void deleteEpic(Long id);
-    void deleteFromHistory(Long id);
-
-    void deleteSubTask(Long id);
-
-    void updateTask(Task task);
+    void addEpic(Epic epic) throws ManagerSaveException;
 
     void updateEpic(Epic epic);
 
-    void updateSubTask(Subtask subtask);
+    void updateTask(Task task);
 
-    HashMap<Long, Task> getTaskMap();
+    void updateSubTask(SubTask subtask);
 
-    HashMap<Long, Epic> getEpicMap();
+    void deleteEpicById(long id);
 
-    HashMap<Long, Subtask> getSubTaskMap();
+    void deleteTaskById(long id);
 
-    ArrayList<Task> getListTask();
+    void deleteSubTaskById(long id);
 
-    ArrayList<Epic> getListEpic();
+    List<Task> history();
 
-    ArrayList<Task> getAllTasks();
+    void removeFromHistoryByID(long id);
 
-    ArrayList<Subtask> getListSubTaskFromEpic(Long idEpicTask);
+    Task getAllTasksById(long id);
 
-    TreeSet<Task> getPrioritizedTasks();
-}
+    List<Task> getPrioritizedTask();
+
+    HashMap<Long, Epic> getEpicsMap();
+
+    public HashMap<Long, Task> getTasksMap();
+
+    public HashMap<Long, SubTask> getSubTasksMap();
+
+    ArrayList<SubTask> getEpicSubtasks(long id);
+    }
+

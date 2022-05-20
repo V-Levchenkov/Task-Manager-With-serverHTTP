@@ -1,264 +1,332 @@
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.managerscollection.HTTPTaskManager;
+import ru.yandex.practicum.managerscollection.Managers;
+import ru.yandex.practicum.managerscollection.interfaces.TaskManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskStatus;
 import ru.yandex.practicum.servers.HTTPTaskServer;
 import ru.yandex.practicum.servers.KVServer;
-import ru.yandex.practicum.servers.serializers.*;
 import ru.yandex.practicum.tasks.Epic;
-import ru.yandex.practicum.tasks.Subtask;
+import ru.yandex.practicum.tasks.SubTask;
 import ru.yandex.practicum.tasks.Task;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class HttpTaskServerTest {
-    private final HttpClient client = HttpClient.newHttpClient();
-    private KVServer kvServer;
-    private HTTPTaskServer taskServer;
-    private HTTPTaskManager taskManager;
-    private final String URL = "http://localhost:8080/tasks/";
-    private String task1 = "{\"id\":\"null\",\"title\":\"task 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-            "\"startTime\":\"null\",\"duration\":\"null\"}";
-    private String task2 = "{\"id\":\"null\",\"title\":\"task 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-            "\"startTime\":\"null\",\"duration\":\"null\"}";
-    private String epic1 = "{\"id\":0,\"title\":\"epic 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-            "\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[]}";
-    private String epic2 = "{\"id\":\"null\",\"title\":\"epic 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-            "\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[]}";
-    private String subtask1 = "{\"id\":\"null\",\"title\":\"subtask 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-            "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-    private String subtask2 = "{\"id\":\"null\",\"title\":\"subtask 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-            "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-    private Gson toGson = new GsonBuilder()
-            .registerTypeAdapter(Task.class, new TaskSerializer())
-            .registerTypeAdapter(Epic.class, new EpicSerializer())
-            .registerTypeAdapter(Subtask.class, new SubtaskSerializer())
-            .create();
-    private Gson fromGson = new GsonBuilder()
-            .registerTypeAdapter(Task.class, new TaskDeserializer())
-            .registerTypeAdapter(Epic.class, new EpicDeserializer())
-            .registerTypeAdapter(Subtask.class, new SubtaskDeserializer())
-            .create();
+public class HTTPTaskServerTest {
+    static KVServer kvServer;
+    HTTPTaskServer httpTaskServer;
+    static TaskManager manager;
+    HttpClient client = HttpClient.newHttpClient();
 
-
-    public void initializeTaskManager() throws IOException {
-        kvServer = new KVServer();
-        kvServer.start();
-        taskManager = new HTTPTaskManager(new File("http://localhost:8080"));
-    }
+    static Task task;
+    static Epic epic1;
+    static SubTask subTask11;
+    static SubTask subTask12;
+    static Epic epic2;
+    static SubTask subTask21;
 
     @BeforeEach
-    public void beforeEach() throws IOException, InterruptedException {
-        initializeTaskManager();
-        taskServer = new HTTPTaskServer(taskManager);
+    void start() throws IOException {
+        kvServer = new KVServer();
+        kvServer.start();
+        manager = Managers.getDefault();
+        httpTaskServer = new HTTPTaskServer(manager);
+        httpTaskServer.start();
     }
+
 
     @AfterEach
-    public void AfterEach() {
+    void stop() {
         kvServer.stop();
-        taskServer.stop();
+        httpTaskServer.stop();
     }
 
     @Test
-    public void postGetAndDeleteSimpleTaskInHttpTaskServerTest() {
-        postMethod(URL + "task/", task1);
-        postMethod(URL + "task/", task2);
-        String responseTask1 = "{\"id\":0,\"title\":\"task 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\"}";
-        String responseTask2 = "[{\"id\":1,\"title\":\"task 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\"}]";
-        assertEquals(getMethod(URL + "task/?id=0"), responseTask1);
-        assertEquals(deleteMethod(URL + "task/?id=0"), "Задача id=0 успешно удалена");
-        assertEquals(getMethod(URL), responseTask2);
-
-        deleteMethod(URL);
-        assertEquals(getMethod(URL), "Список задач пуст");
+    void GETTasksWhileEmptyList() {
+        String body = sendGetRquest("tasks/task/").body();
+        assertEquals(body, "[]");
     }
 
     @Test
-    public void postGetAndDeleteEpicInHttpTaskServerTest() {
-        postMethod(URL + "epic", epic1);
-        postMethod(URL + "epic", epic2);
-        String responseEpic1 = "{\"id\":0,\"title\":\"epic 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[]}";
-        String responseEpic2 = "{\"id\":1,\"title\":\"epic 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[]}";
-        assertEquals(getMethod(URL), "Список задач пуст");
-        assertEquals(getMethod(URL + "epic/?id=0"), responseEpic1);
-        assertEquals(deleteMethod(URL + "epic/?id=0"), "Эпик id=0 успешно удалён");
-        assertEquals(getMethod(URL + "epic/?id=1"), responseEpic2);
-        deleteMethod(URL);
-        assertEquals(getMethod(URL + "epic/?id=1"), "Произошла ошибка во время получения эпика");
+    void GETTasksWhileNotEmptyList() {
+        String taskJson = "[{\"name\":\"name\",\"description\":\"description\",\"uin\":1,\"status\":\"NEW\"," +
+                "\"duration\":{\"seconds\":3000,\"nanos\":0},\"startTime\":{\"date\":{\"year\":2022,\"month\":4," +
+                "\"day\":17},\"time\":{\"hour\":9,\"minute\":0,\"second\":0,\"nano\":0}}}]";
+
+        sendPostRequest("task", task);
+        assertEquals(sendGetRquest("tasks/task").body(), taskJson);
     }
 
     @Test
-    public void getSubtasksListInEpicInHttpTaskServerTest() {
-        String responseSubtask1 = "{\"id\":2,\"title\":\"subtask 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-        postMethod(URL + "epic", epic1);
-        postMethod(URL + "epic", epic2);
-        assertEquals(getMethod(URL + "epic/subtasks/?id=0"), "У эпика id=0 нет подзадач");
-        postMethod(URL + "subtask", subtask1);
-        assertEquals(getMethod(URL + "epic/subtasks/?id=0"), "[" + responseSubtask1 + "]");
-        assertEquals(getMethod(URL + "epic/subtasks/?id=1"), "У эпика id=1 нет подзадач");
+    void GETSubTasksWhileEmptyList() {
+        assertEquals(sendGetRquest("tasks/subtask/").body(), "[]");
     }
 
     @Test
-    public void postGetAndDeleteSubtaskInHttpTaskServerTest() {
-        postMethod(URL + "epic", epic1);
-        postMethod(URL + "epic", epic2);
-        postMethod(URL + "subtask", subtask1);
-        postMethod(URL + "subtask", subtask2);
-        String responseEpic1 = "{\"id\":0,\"title\":\"epic 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[2,3]}";
-        String responseEpic2 = "{\"id\":1,\"title\":\"epic 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[]}";
-        String responseSubtask1 = "{\"id\":2,\"title\":\"subtask 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-        String responseSubtask2 = "{\"id\":3,\"title\":\"subtask 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-        assertEquals(getMethod(URL + "subtask/?id=2"), responseSubtask1);
-        assertEquals(getMethod(URL + "subtask/?id=3"), responseSubtask2);
-        assertEquals(getMethod(URL + "subtask/?id=4"), "Произошла ошибка во время получения подзадачи");
-        assertEquals(getMethod(URL + "epic/?id=0"), responseEpic1);
-        assertEquals(deleteMethod(URL + "epic/?id=0"), "Эпик id=0 успешно удалён");
-        assertEquals(getMethod(URL + "epic/?id=1"), responseEpic2);
-        deleteMethod(URL);
-        assertEquals(getMethod(URL + "epic/?id=1"), "Произошла ошибка во время получения эпика");
+    void GETSubTasksWhileNotEmptyList() {
+        Gson gson = new Gson();
+        sendPostRequest("subtask", subTask11);
+        String subtaskJson = "[" + gson.toJson(manager.getSubTaskById(1)) + "]";
+        assertEquals(sendGetRquest("tasks/subtask/").body(), subtaskJson);
     }
 
     @Test
-    public void postGetDeleteAndUpdateDifferentTaskInHttpTaskServerTest() {
-        postMethod(URL + "epic", epic1);
-        postMethod(URL + "epic", epic2);
-        postMethod(URL + "subtask", subtask1);
-        postMethod(URL + "subtask", subtask2);
-        String responseEpic1 = "{\"id\":0,\"title\":\"epic 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[2,3]}";
-        String responseSubtask1 = "{\"id\":2,\"title\":\"subtask 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-        String responseSubtask2 = "{\"id\":3,\"title\":\"subtask 2\",\"description\":\"desc 2\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-        String subtask3 = "{\"id\":2,\"title\":\"subtask 1\",\"description\":\"desc 1\"," +
-                "\"status\":\"IN_PROGRESS\",\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-        String subtask4 = "{\"id\":3,\"title\":\"subtask 2\",\"description\":\"desc 2\",\"status\":\"DONE\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}";
-        String task3 = "{\"id\":4,\"title\":\"task 1\",\"description\":\"desc 1\",\"status\":\"DONE\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\"}";
-        String responseTask1 = "{\"id\":4,\"title\":\"task 1\",\"description\":\"desc 1\",\"status\":\"NEW\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\"}";
-        String responseTask2 = "{\"id\":4,\"title\":\"task 1\",\"description\":\"desc 1\",\"status\":\"DONE\"," +
-                "\"startTime\":\"null\",\"duration\":\"null\"}";
-        assertEquals(getMethod(URL + "subtask/?id=2"), responseSubtask1);
-        assertEquals(getMethod(URL + "subtask/?id=3"), responseSubtask2);
-        assertEquals(getMethod(URL + "epic/?id=0"), responseEpic1);
-        assertEquals(taskManager.getEpicById(0L).getStatus(), TaskStatus.NEW);
-        postMethod(URL + "subtask/?id=2", subtask3);
-        assertEquals(taskManager.getEpicById(0L).getStatus(), TaskStatus.IN_PROGRESS);
-        postMethod(URL + "subtask/?id=3", subtask4);
-        assertEquals(taskManager.getEpicById(0L).getStatus(), TaskStatus.IN_PROGRESS);
-        assertEquals(taskManager.getSubTaskById(2L).getStatus(), TaskStatus.IN_PROGRESS);
-        assertEquals(taskManager.getSubTaskById(3L).getStatus(), TaskStatus.DONE);
-        deleteMethod(URL + "subtask/?id=2");
-        assertEquals(taskManager.getEpicById(0L).getStatus(), TaskStatus.DONE);
-        deleteMethod(URL + "subtask/?id=3");
-        assertEquals(taskManager.getEpicById(0L).getStatus(), TaskStatus.NEW);
-        postMethod(URL + "task/", task1);
-        assertEquals(getMethod(URL + "task/?id=4"), responseTask1);
-        postMethod(URL + "task/?id=4", task3);
-        assertEquals(getMethod(URL + "task/?id=4"), responseTask2);
+    void GETEpicsWhileEmptyList() {
+        assertEquals(sendGetRquest("tasks/subtask/").body(), "[]");
     }
 
     @Test
-    public void getHistoryInHttpTaskServerTest() {
-        postMethod(URL + "epic", epic1);
-        postMethod(URL + "epic", epic2);
-        postMethod(URL + "subtask", subtask1);
-        postMethod(URL + "subtask", subtask2);
-        postMethod(URL + "task/", task1);
-        postMethod(URL + "task/", task2);
-        assertEquals(getMethod(URL + "history"), "История просмотров пуста");
-        getMethod(URL + "subtask/?id=2");
-        getMethod(URL + "epic/?id=0");
-        assertEquals(getMethod(URL + "history"), "{\"id\":2,\"title\":\"subtask 1\",\"description\":\"desc 1\"," +
-                "\"status\":\"NEW\",\"startTime\":\"null\",\"duration\":\"null\",\"epicId\":0}{\"id\":0," +
-                "\"title\":\"epic 1\",\"description\":\"desc 1\",\"status\":\"NEW\",\"startTime\":\"null\"," +
-                "\"endTime\":\"null\",\"subtasks\":[2,3]}");
-        deleteMethod(URL + "epic/?id=0");
-        getMethod(URL + "epic/?id=1");
-        getMethod(URL + "task/?id=5");
-        getMethod(URL + "task/?id=6");
-        assertEquals(getMethod(URL + "history"), "{\"id\":1,\"title\":\"epic 2\",\"description\":\"desc 2\"," +
-                "\"status\":\"NEW\",\"startTime\":\"null\",\"endTime\":\"null\",\"subtasks\":[]}{\"id\":5," +
-                "\"title\":\"task 2\",\"description\":\"desc 2\",\"status\":\"NEW\",\"startTime\":\"null\"," +
-                "\"duration\":\"null\"}");
+    void GETEpicsTaskWhileNotEmptyList() {
+        Gson gson = new Gson();
+        sendPostRequest("epic", epic1);
+        String subtaskJson = "[" + gson.toJson(manager.getEpicById(1)) + "]";
+        assertEquals(sendGetRquest("tasks/epic/").body(), subtaskJson);
     }
 
-    private String deleteMethod(String url) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .DELETE()
-                .build();
+    @Test
+    void GETTasksByIdWhileEmptyList() {
+        assertEquals(sendGetRquest("tasks/task/?id=1").body(), "");
+    }
+
+    @Test
+    void GETTasksByIdWhileNotEmptyList() {
+        sendPostRequest("task", task);
+        String string = sendGetRquest("tasks/task/?id=1").body();
+        String testString = "{\"name\":\"name\",\"description\":\"description\",\"uin\":1,\"status\":\"NEW\"," +
+                "\"duration\":{\"seconds\":3000,\"nanos\":0},\"startTime\":{\"date\":{\"year\":2022,\"month\":4," +
+                "\"day\":17},\"time\":{\"hour\":9,\"minute\":0,\"second\":0,\"nano\":0}}}";
+        assertEquals(string, testString);
+
+    }
+
+    @Test
+    void GETSubTasksByIdWhileEmptyList() {
+        assertEquals(sendGetRquest("tasks/subtask/?id=1").body(), "");
+    }
+
+    @Test
+    void GETSubTasksByIdWhileNotEmptyList() {
+        sendPostRequest("subtask", subTask11);
+        String string = sendGetRquest("tasks/subtask/?id=1").body();
+        String testString = "{\"epicId\":0,\"name\":\"subTask11Name\",\"description\":\"subTask11Description\"," +
+                "\"uin\":1,\"status\":\"NEW\",\"duration\":{\"seconds\":3600,\"nanos\":0}," +
+                "\"startTime\":{\"date\":{\"year\":2022,\"month\":4,\"day\":16},\"time\":{\"hour\":10," +
+                "\"minute\":0,\"second\":0,\"nano\":0}}}";
+        assertEquals(string, testString);
+    }
+
+    @Test
+    void GETEpicsByIdWhileEmptyList() {
+        assertEquals(sendGetRquest("tasks/epic/?id=1").body(), "");
+    }
+
+    @Test
+    void GETEpicsByIdWhileNotEmptyList() {
+        sendPostRequest("epic", epic1);
+        String string = sendGetRquest("tasks/epic/?id=1").body();
+        String testString = "{\"subTasks\":[],\"name\":\"epic1Name\",\"description\":\"epic1Description\"," +
+                "\"uin\":1,\"status\":\"NEW\"}";
+        assertEquals(string, testString);
+    }
+
+    @Test
+    void GEThistoryWhileEmpty() {
+        assertEquals(sendGetRquest("tasks/history").body(), "[]");
+    }
+
+    @Test
+    void GEThistory() {
+        sendPostRequest("task", task);
+        sendPostRequest("epic", epic1);
+        sendPostRequest("subtask", subTask11);
+        sendGetRquest("tasks/task/?id=1");
+        sendGetRquest("tasks/epic/?id=2");
+        String jsonOftaskAndEpic = "[{\"name\":\"name\",\"description\":\"description\",\"uin\":1," +
+                "\"status\":\"NEW\",\"duration\":{\"seconds\":3000,\"nanos\":0}," +
+                "\"startTime\":{\"date\":{\"year\":2022,\"month\":4,\"day\":17},\"time\":{\"hour\":9,\"minute\":0," +
+                "\"second\":0,\"nano\":0}}},{\"subTasks\":[],\"name\":\"epic1Name\"," +
+                "\"description\":\"epic1Description\",\"uin\":2,\"status\":\"NEW\"}]";
+        assertEquals(sendGetRquest("tasks/history").body(), jsonOftaskAndEpic);
+    }
+
+    @Test
+    void GETTasksPriority() {
+        sendPostRequest("task", task);
+        String testString = "[{\"name\":\"name\",\"description\":\"description\",\"uin\":1,\"status\":\"NEW\"," +
+                "\"duration\":{\"seconds\":3000,\"nanos\":0},\"startTime\":{\"date\":{\"year\":2022,\"month\":4," +
+                "\"day\":17},\"time\":{\"hour\":9,\"minute\":0,\"second\":0,\"nano\":0}}}]";
+        assertEquals(sendGetRquest("tasks").body(), testString);
+    }
+
+    @Test
+    void GETTasksPriorityWhileEmpty() {
+        assertEquals(sendGetRquest("tasks").body(), "[]");
+    }
+
+    @Test
+    void POSTTask() {
+        Task newtask = cloneTask(task);
+        newtask.setTaskId(1);
+        sendPostRequest("task", task);
+        assertEquals(manager.getAllTasksById(1), newtask);
+    }
+
+    @Test
+    void POSTEpic() {
+        Task newtask = cloneEpic(epic1);
+        newtask.setTaskId(1);
+        newtask.setStatus(TaskStatus.NEW);
+        sendPostRequest("epic", epic1);
+        assertEquals(manager.getAllTasksById(1), newtask);
+    }
+
+    @Test
+    void POSTSubTask() {
+        Task newtask = cloneSubTask(subTask11);
+        newtask.setTaskId(1);
+        sendPostRequest("subtask", subTask11);
+        assertEquals(manager.getAllTasksById(1), newtask);
+    }
+
+    @Test
+    void DeleteTasks() {
+        sendPostRequest("task", task);
+        sendPostRequest("epic", epic1);
+        sendPostRequest("subtask", subTask11);
+        deleteRequest("tasks/task");
+        assertEquals(sendGetRquest("tasks/task").body(), "[]");
+
+    }
+
+    void DeleteEpics() {
+        sendPostRequest("task", task);
+        sendPostRequest("epic", epic1);
+        sendPostRequest("subtask", subTask11);
+        assertEquals(sendGetRquest("tasks/epic").body(), "[]");
+    }
+
+    void DeleteSubTasks() {
+        sendPostRequest("task", task);
+        sendPostRequest("epic", epic1);
+        sendPostRequest("subtask", subTask11);
+        assertEquals(sendGetRquest("tasks/subtask").body(), "[]");
+    }
+
+    void DeleteTask() {
+        sendPostRequest("task", task);
+        sendPostRequest("epic", epic1);
+        sendPostRequest("subtask", subTask11);
+        assertEquals(sendGetRquest("tasks/task/?id=1").body(), "[]");
+    }
+
+    void DeleteSubTask() {
+        sendPostRequest("task", task);
+        sendPostRequest("epic", epic1);
+        sendPostRequest("subtask", subTask11);
+        assertEquals(sendGetRquest("tasks/subtasktask/?id=3").body(), "[]");
+    }
+
+    void DeleteEpic() {
+        sendPostRequest("task", task);
+        sendPostRequest("epic", epic1);
+        sendPostRequest("subtask", subTask11);
+        assertEquals(sendGetRquest("tasks/epic/?id=2").body(), "[]");
+    }
+
+    void sendPostRequest(String path, Task newTask) {
+        HttpResponse<String> response = null;
+        try {
+            URI url = URI.create("http://localhost:8080/tasks/" + path);
+            Gson gson = new Gson();
+
+            String json = gson.toJson(newTask);
+
+            HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
+
+            response = HttpClient.newHttpClient().send(HttpRequest.newBuilder().uri(url)
+                    .POST(body).build(), HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            System.out.println("");
+        }
+
+    }
+
+    HttpResponse<String> sendGetRquest(String path) {
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/" + path);
+        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = null;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                System.out.println("Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode());
-            }
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
-        return response.body();
+        return response;
     }
 
-    private String getMethod(String url) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .GET()
-                .build();
-        HttpResponse<String> response = null;
+    void deleteRequest(String path) {
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/" + path);
+        HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                System.out.println("Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode());
-            }
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
-        }
-        assert response != null;
-        return response.body();
-    }
-
-    private void postMethod(String url, String jsonString) {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonString))
-                .build();
-        HttpResponse<String> response = null;
-        try {
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                System.out.println("Что-то пошло не так. Сервер вернул код состояния: " + response.statusCode());
-            }
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса возникла ошибка.\n" +
-                    "Проверьте, пожалуйста, адрес и повторите попытку.");
+            client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
+    @BeforeAll
+    static void fillServer() {
+        task = new Task("name", "description",
+                LocalDateTime.of(2022, 4, 17, 9, 0), Duration.ofMinutes(50));
+
+        epic1 = new Epic("epic1Name", "epic1Description");
+
+        subTask11 = new SubTask("subTask11Name", "subTask11Description", epic1.getTaskId(),
+                LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(60));
+
+        subTask12 = new SubTask("subTask12Name", "subTask12Description", epic1.getTaskId(),
+                LocalDateTime.of(2022, 4, 16, 11, 0), Duration.ofMinutes(60));
+
+        epic2 = new Epic("epic2Name", "epic2Description");
+
+        subTask21 = new SubTask("subTask21Name", "subTask21Description", epic2.getTaskId(),
+                LocalDateTime.of(2022, 4, 16, 13, 0), Duration.ofMinutes(60));
+    }
+
+    //    методы для некоторых тестов
+    public SubTask cloneSubTask(SubTask subTask) {
+        SubTask newSubTask = new SubTask(subTask.getTaskName(), subTask.getTaskDescription(), subTask.getEpicId(), subTask.getStartTime(), subTask.getDuration());
+        newSubTask.setTaskId(subTask.getTaskId());
+        newSubTask.setStatus(subTask.getStatus());
+        return newSubTask;
+    }
+
+    public Task cloneTask(Task taskToClone) {
+        Task newTask = new Task(taskToClone.getTaskName(), taskToClone.getTaskDescription(), taskToClone.getStartTime(), taskToClone.getDuration());
+        newTask.setTaskId(taskToClone.getTaskId());
+        newTask.setStatus(taskToClone.getStatus());
+        return newTask;
+    }
+
+    public Epic cloneEpic(Epic epicToClone) {
+        Epic newEpic = new Epic(epicToClone.getTaskName(), epicToClone.getTaskDescription());
+        for (SubTask subtask : epicToClone.getSubTasks()) {
+            newEpic.addSubtask(subtask);
+        }
+        newEpic.setTaskId(epicToClone.getTaskId());
+        newEpic.refreshEpicData();
+        newEpic.refreshEndTime();
+        return newEpic;
+    }
 }

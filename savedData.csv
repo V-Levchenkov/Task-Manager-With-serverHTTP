@@ -1,5 +1,0 @@
-taskId;type;name;status;description;startTime;duration;endTime;epic
-1;Task;Задача №1;NEW;Описание задачи №1 ;null;0;null
-2;Task;Задача №2;NEW;Описание задачи №2 ;null;0;null
- 
-1,2

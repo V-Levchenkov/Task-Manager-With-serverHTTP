@@ -1,123 +1,94 @@
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.managerscollection.FileBackedTasksManager;
-import ru.yandex.practicum.managerscollection.interfaces.TaskStatus;
 import ru.yandex.practicum.tasks.Epic;
-import ru.yandex.practicum.tasks.Subtask;
-import ru.yandex.practicum.tasks.Task;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
 
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.File;
-
-
-public class FileBackedTasksManagerTest extends TaskManagerTest<FileBackedTasksManager> {
-    public FileBackedTasksManagerTest() {
-        super(new FileBackedTasksManager(new File("savedData.csv")));
-    }
-
-    private final File file = new File("TestSaveTasks.csv");
-    private final FileBackedTasksManager fileBackedTasksManager = new FileBackedTasksManager(file);
-    private final FileBackedTasksManager fileBackedTasksManager1 = FileBackedTasksManager.loadFromFile(file);
-    private final Task task1 = new Task("Test Task1", "Test description1");
-    private final Task task2 = new Task("Test Task2", "Test description2", TaskStatus.IN_PROGRESS);
-    private final Task task3 = new Task("Test Task3", "Test description3", TaskStatus.DONE);
-    private final Epic epic1 = new Epic("Test epicTask1", "Test description4");
-    private final Epic epic2 = new Epic("Test epicTask2", "Test description5");
-    private final Epic epic3 = new Epic("Test epicTask3", "Test description6");
-    private final Subtask subTask1 = new Subtask("sub1", "desc", TaskStatus.NEW, epic1.getTaskId());
-    private final Subtask subTask2 = new Subtask("sub2", "desc", TaskStatus.IN_PROGRESS, epic1.getTaskId());
-    private final Subtask subTask3 = new Subtask("sub3", "desc", TaskStatus.DONE, epic1.getTaskId());
-    private final Subtask subTask4 = new Subtask("sub4", "desc", TaskStatus.NEW, epic1.getTaskId());
-    private final Subtask subTask5 = new Subtask("sub5", "desc", TaskStatus.DONE, epic2.getTaskId());
-    private final Subtask subTask6 = new Subtask("sub6", "desc", TaskStatus.NEW, epic2.getTaskId());
-    private final Subtask subTask7 = new Subtask("sub7", "desc", TaskStatus.DONE, epic3.getTaskId());
-
-
-    @Test
-    void emptyFileNameTest() {
-        final Task task10 = new Task("Test Task1", "Test description1");
-        FileBackedTasksManager fileBackedTasksManager1 = new FileBackedTasksManager(new File(""));
-        FileBackedTasksManager.ManagerSaveException ex = assertThrows(FileBackedTasksManager.ManagerSaveException.class, () -> fileBackedTasksManager1.addTask(task10));
-        assertEquals("Произошла ошибка во время записи в файл.", ex.getMessage());
+    @BeforeEach
+    public void beforeEach() {
+        filledManager = new FileBackedTasksManager("tests.csv");
+        emptyManager = new FileBackedTasksManager("tests.csv");
+        filledManager.addTask(task);
+        filledManager.addEpic(epic1);
+        filledManager.addSubTask(subTask11, 2);
+        filledManager.addSubTask(subTask12, 2);
+        filledManager.addEpic(epic2);
+        filledManager.addSubTask(subTask21, 5);
     }
 
     @Test
-    void addInFileTest() {
-        assertTrue(fileBackedTasksManager.history().isEmpty(), "Список не пустой");
-        assertTrue(fileBackedTasksManager.getAllTasks().isEmpty(), "Список не пустой");
-        fileBackedTasksManager.addTask(task1);
-        fileBackedTasksManager.addTask(task2);
-        fileBackedTasksManager.addTask(task3);
-
-        fileBackedTasksManager.addEpic(epic1);
-        fileBackedTasksManager.addEpic(epic2);
-        fileBackedTasksManager.addEpic(epic3);
-
-        subTask1.setEpicId(epic1.getTaskId());
-        subTask2.setEpicId(epic1.getTaskId());
-        subTask3.setEpicId(epic1.getTaskId());
-        subTask4.setEpicId(epic1.getTaskId());
-        subTask5.setEpicId(epic2.getTaskId());
-        subTask6.setEpicId(epic2.getTaskId());
-        subTask7.setEpicId(epic3.getTaskId());
-
-        fileBackedTasksManager.addSubTask(subTask1);
-        fileBackedTasksManager.addSubTask(subTask2);
-        fileBackedTasksManager.addSubTask(subTask3);
-        fileBackedTasksManager.addSubTask(subTask4);
-        fileBackedTasksManager.addSubTask(subTask5);
-        fileBackedTasksManager.addSubTask(subTask6);
-        fileBackedTasksManager.addSubTask(subTask7);
-
-        fileBackedTasksManager.getTaskById(task1.getTaskId());
-        fileBackedTasksManager.getTaskById(task2.getTaskId());
-        fileBackedTasksManager.getTaskById(task3.getTaskId());
-
-        fileBackedTasksManager.getEpicById(epic1.getTaskId());
-        fileBackedTasksManager.getEpicById(epic2.getTaskId());
-        fileBackedTasksManager.getEpicById(epic3.getTaskId());
-
-        fileBackedTasksManager.getSubTaskById(subTask1.getTaskId());
-        fileBackedTasksManager.getSubTaskById(subTask2.getTaskId());
-        fileBackedTasksManager.getSubTaskById(subTask3.getTaskId());
-        fileBackedTasksManager.getSubTaskById(subTask4.getTaskId());
-        fileBackedTasksManager.getSubTaskById(subTask5.getTaskId());
-        fileBackedTasksManager.getSubTaskById(subTask6.getTaskId());
-        fileBackedTasksManager.getSubTaskById(subTask7.getTaskId());
-        assertEquals(13, fileBackedTasksManager.getAllTasks().size(), "размер AllTasks() отличается"
-                + " от запрошенных задач задач");
-        assertEquals(13, fileBackedTasksManager.history().size(), "размер history() отличается"
-                + " от запрошенных задач задач");
-        System.out.println("Список задач после сохранения:");
-        for (Task task : fileBackedTasksManager.getAllTasks()) {
-            System.out.println(task);
-        }
-        System.out.println("история после сохранения:");
-        for (Task task : fileBackedTasksManager.history()) {
-            System.out.println(task);
+    void saveWhileEmptyTasksList() {
+        emptyManager.save();
+        try {
+            Assertions.assertEquals(Files.readAllLines(Paths.get("tests.csv")).size(), 2);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @Test
-    void loadFromFileTest() {
-        assertFalse(fileBackedTasksManager1.history().isEmpty(), "Список истории пустой после загрузки из файла");
-        assertFalse(fileBackedTasksManager1.getAllTasks().isEmpty(), "Список задач пустой после загрузки из файла");
-        fileBackedTasksManager1.addTask(task1);
-        fileBackedTasksManager1.addTask(task2);
-        fileBackedTasksManager1.addTask(task3);
-        fileBackedTasksManager1.getTaskById(task1.getTaskId());
-        fileBackedTasksManager1.getTaskById(task2.getTaskId());
-        fileBackedTasksManager1.getTaskById(task3.getTaskId());
-        System.out.println("Список задач после загрузки:");
-        for (int i = 0; i < fileBackedTasksManager1.getAllTasks().size(); i++) {
-            System.out.println((i + 1) + ": " + fileBackedTasksManager1.getAllTasks().get(i));
+    void saveContainsEpicWithNoSubTasks() {
+        emptyManager.addEpic(new Epic("epicName", "epicDescription"));
+        emptyManager.save();
+        String string = null;
+        try {
+            string = Files.readAllLines(Paths.get("tests.csv")).get(1);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        assertEquals(string, "1,EPIC,epicName,NEW,epicDescription,null,null,null");
+    }
 
-        System.out.println("история после загрузки:");
-        for (int i = 0; i < fileBackedTasksManager1.history().size(); i++) {
-            System.out.println((i + 1) + ": " + fileBackedTasksManager1.history().get(i));
+    @Test
+    void saveContainsFilledHistory() {
+        emptyManager.addEpic(epic1);
+        emptyManager.getEpicById(1);
+        emptyManager.save();
+        try {
+            Assertions.assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(3), "1");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void justSaveFilledManager() {
+        filledManager.getTaskById(1);
+        filledManager.getSubTaskById(3);
+        filledManager.getEpicById(2);
+        filledManager.save();
+
+        try {
+            assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(1),
+                    "1,TASK,name,NEW,description,2022-04-17T09:00,PT50M,2022-04-17T09:50");
+
+            assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(2),
+                    "3,SUBTASK,subTask11Name,NEW,subTask11Description,2,2022-04-16T10:00,PT1H,2022-04-16T11:00");
+
+            assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(3),
+                    "4,SUBTASK,subTask12Name,NEW,subTask12Description,2,2022-04-16T11:00,PT1H,2022-04-16T12:00");
+
+            assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(4),
+                    "6,SUBTASK,subTask21Name,DONE,subTask21Description,5,2022-04-16T13:00,PT1H,2022-04-16T14:00");
+
+            assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(5),
+                    "2,EPIC,epic1Name,NEW,epic1Description,2022-04-16T10:00,PT2H,2022-04-16T12:00");
+
+            assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(6),
+                    "5,EPIC,epic2Name,DONE,epic2Description,2022-04-16T13:00,PT1H,2022-04-16T14:00");
+
+            assertEquals(Files.readAllLines(Paths.get("tests.csv")).get(8), "1,3,2");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

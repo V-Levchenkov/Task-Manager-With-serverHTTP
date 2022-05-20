@@ -1,116 +1,99 @@
 package ru.yandex.practicum.managerscollection;
 
 import ru.yandex.practicum.managerscollection.interfaces.HistoryManager;
-import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.Task;
 
 import java.util.*;
 
 
 public class InMemoryHistoryManager implements HistoryManager {
+    public Node<Task> head;
+    public Node<Task> tail;
+    private int size = 0;
+    private Map<Long, Node<Task>> map;
 
-    private Knot history = new Knot();
-    private Map<Long, Node> nodeMap = new HashMap<>();
+    public InMemoryHistoryManager() {
+        map = new HashMap<Long, Node<Task>>();
+    }
 
-    public List<Task> getHistory() {
-        return history.getTasks();
+    public void linkLast(Task element) {
+        Node<Task> t = tail;
+        Node<Task> newNode = new Node<>(element, null, t);
+        tail = newNode;
+        if (t == null)
+            head = newNode;
+        else
+            t.next = newNode;
+        size++;
+    }
+
+    void removeNode(Node<Task> node) {
+        if (node.prev == null && node.next == null) {
+            head = null;
+            tail = null;
+            return;
+        }
+        if (node.prev == null) {
+            head = node.next;
+            node.next.prev = null;
+        } else if (node.next == null) {
+            tail = node.prev;
+            node.prev.next = null;
+        } else {
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
+        }
+        size--;
+    }
+
+    Node<Task> getLast(Node<Task> head) {
+        Node<Task> temp = head;
+        if (temp == null) {
+            return null;
+        }
+        while (temp.next != null) {
+            temp = temp.next;
+        }
+        return temp;
     }
 
     @Override
     public void add(Task task) {
-        if (task == null) {
-            return;
-        } else {
-            long idTask = task.getTaskId();
-            if (nodeMap.containsKey(idTask)) {
-                Node node = nodeMap.get(idTask);
-                history.removeNode(node);
-                history.linkLast(task);
-            } else {
-                history.linkLast(task);
-            }
+        if (map.containsKey(task.getTaskId())) {
+            removeNode(map.get(task.getTaskId()));
+            remove(task.getTaskId());
         }
+        linkLast(task);
+        map.put(task.getTaskId(), getLast(head));
     }
 
     @Override
-    public void remove(Long id) {
-        if (nodeMap.containsKey(id)) {
-            Node node = nodeMap.get(id);
-            Task task = node.getTask();
-            Epic epic = new Epic();
-            if (task.getClass() == epic.getClass()) {
-                epic = (Epic) task;
-                for (Long idSubTask : epic.getSubTaskId()) {
-                    Node nodeSubTask = nodeMap.get(idSubTask);
-                    history.removeNode(nodeSubTask);
-                }
+    public List<Task> getHistory() {
+        List<Task> tasks = new ArrayList<>();
+        Node<Task> thisNode = this.head;
+        if (thisNode != null) {
+            while (thisNode.next != null) {
+                tasks.add(thisNode.data);
+                thisNode = thisNode.next;
             }
-            history.removeNode(node);
-        } else {
-            System.out.println("Нет такой задачи в истории");
+            tasks.add(thisNode.data);
         }
+        return tasks;
     }
 
-    public class Knot {
-
-        public Node head;
-        public Node tail;
-
-        public void linkLast(Task task) {
-            final Node oldLastNode = tail;
-            final Node newNode = new Node(oldLastNode, task, null);
-            tail = newNode;
-            if (oldLastNode == null)
-                head = newNode;
-            else
-                oldLastNode.setNext(newNode);
-            nodeMap.put(task.getTaskId(), newNode);
-        }
-
-        public void removeNode(Node node) {
-            if (head == null && tail == null) {
-                return;
-            } else if (head.getNext() == null && tail.getPrev() == null) {
-                head = tail = null;
-            } else {
-                if (node.getPrev() == null) {
-                    head = head.getNext();
-                    head.setPrev(null);
-                } else if (node.getNext() == null) {
-                    tail = tail.getPrev();
-                    tail.setNext(null);
-                } else {
-                    Node prevTaskNode = node.getPrev();
-                    Node nextTaskNode = node.getNext();
-                    prevTaskNode.setNext(nextTaskNode);
-                    nextTaskNode.setPrev(prevTaskNode);
-                }
-            }
-            nodeMap.remove(node.getTask().getTaskId());
-        }
-
-        public List<Task> getTasks() {
-            List<Task> taskHistory = new ArrayList<>();
-            Node node = head;
-            while (node != null) {
-                taskHistory.add(node.getTask());
-                node = node.getNext();
-            }
-            return taskHistory;
-        }
-    }
     @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        for (Task task : getHistory()) {
-            if (result.length() == 0) {
-                result.append(task.getTaskId());
-            }else{
-                result.append(",");
-                result.append(task.getTaskId());
-            }
+    public int getSize() {
+            return size;
         }
-        return result.toString();
+
+
+    @Override
+    public void remove(long id) {
+        if (map.containsKey(id)) {
+            removeNode(map.get(id));
+            map.remove(id);
+        }
     }
 }
+
 
