@@ -47,7 +47,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<SubTask> getEpicSubtasks(long id) {
-        return (ArrayList<SubTask>) ((Epic)getAllTasksById(id)).getSubtasks();
+        return (ArrayList<SubTask>) ((Epic) getAllTasksById(id)).getSubtasks();
     }
 
     public Set<Task> getPrioritizedTasks() {
@@ -211,9 +211,10 @@ public class InMemoryTaskManager implements TaskManager {
             if (taskIsValid(newSubtask)) {
                 SubTasks.put(newSubtask.getTaskId(), newSubtask);
                 prioritizedTasks.add(newSubtask);
-                if(epic.getSubTasks().contains(oldSubTask)){
+                if (epic.getSubTasks().contains(oldSubTask)) {
                     epic.getSubTasks().remove(oldSubTask);
-                    epic.getSubTasks().add(newSubtask);}
+                    epic.getSubTasks().add(newSubtask);
+                }
                 epic.refreshEpicData();
                 epic.refreshEndTime();
             } else {
@@ -322,7 +323,6 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Task> getPrioritizedTask() {
         return new ArrayList<Task>(getPrioritizedTasks());
     }
-
 
 
     public Task cloneTask(Task taskToClone) {

@@ -61,5 +61,5 @@ public interface TaskManager {
     public HashMap<Long, SubTask> getSubTasksMap();
 
     ArrayList<SubTask> getEpicSubtasks(long id);
-    }
+}
 

@@ -64,7 +64,7 @@ public class Epic extends Task {
 
     public void refreshEpicData() {
 
-        if(subTasks.size()>0){
+        if (subTasks.size() > 0) {
             LocalDateTime tempDateTime = subTasks.get(0).getStartTime();
             Duration tempDuration = Duration.ZERO;
             int doneCounter = 0;
@@ -89,7 +89,8 @@ public class Epic extends Task {
             } else setStatus(TaskStatus.IN_PROGRESS);
 
             setDuration(tempDuration);
-            setStartTime(tempDateTime);}
+            setStartTime(tempDateTime);
+        }
     }
 
     public List<SubTask> getSubtasks() {

@@ -3,7 +3,10 @@ package ru.yandex.practicum.managerscollection;
 import ru.yandex.practicum.managerscollection.interfaces.HistoryManager;
 import ru.yandex.practicum.tasks.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -83,8 +86,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public int getSize() {
-            return size;
-        }
+        return size;
+    }
 
 
     @Override

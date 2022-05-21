@@ -138,7 +138,8 @@ public class KVServer {
         h.sendResponseHeaders(200, resp.length);
         h.getResponseBody().write(resp);
     }
-@AfterEach
+
+    @AfterEach
     public void stop() {
         server.stop(0);
     }

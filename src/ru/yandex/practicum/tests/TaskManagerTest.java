@@ -533,11 +533,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
         newEpic.refreshEndTime();
         return newEpic;
     }
+
     public SubTask cloneSubTask(SubTask subTask) {
-            SubTask newSubTask = new SubTask(subTask.getTaskName(), subTask.getTaskDescription(), subTask.getEpicId(), subTask.getStartTime(), subTask.getDuration());
-            newSubTask.setTaskId(subTask.getTaskId());
-            newSubTask.setStatus(subTask.getStatus());
-            return newSubTask;
+        SubTask newSubTask = new SubTask(subTask.getTaskName(), subTask.getTaskDescription(), subTask.getEpicId(), subTask.getStartTime(), subTask.getDuration());
+        newSubTask.setTaskId(subTask.getTaskId());
+        newSubTask.setStatus(subTask.getStatus());
+        return newSubTask;
     }
 }
 

@@ -18,13 +18,13 @@ class HistoryManagerTest {
 
 
     @BeforeEach
-    void createManager () {
+    void createManager() {
         manager = new InMemoryHistoryManager();
-        task = new Task("name", "description", LocalDateTime.of(2022,4,16,10,0), Duration.ofMinutes(50));
+        task = new Task("name", "description", LocalDateTime.of(2022, 4, 16, 10, 0), Duration.ofMinutes(50));
         task.setTaskId(1);
         epic = new Epic("epicName", "epicDescription");
         epic.setTaskId(2);
-        subTask = new SubTask("subTaskName", "subTaskDescription", epic.getTaskId(), LocalDateTime.of(2022,4,16,10,50), Duration.ofMinutes(50));
+        subTask = new SubTask("subTaskName", "subTaskDescription", epic.getTaskId(), LocalDateTime.of(2022, 4, 16, 10, 50), Duration.ofMinutes(50));
         subTask.setTaskId(3);
     }
 
@@ -66,7 +66,7 @@ class HistoryManagerTest {
     }
 
     @Test
-    void removeNonExistent(){
+    void removeNonExistent() {
         manager.add(epic);
         manager.add(subTask);
         manager.add(task);
@@ -102,12 +102,12 @@ class HistoryManagerTest {
     }
 
     @Test
-    void getSizeIfManagerEmpty(){
+    void getSizeIfManagerEmpty() {
         Assertions.assertEquals(manager.getSize(), 0);
     }
 
     @Test
-    void getSizeIfManagerFilled(){
+    void getSizeIfManagerFilled() {
         manager.add(epic);
         manager.add(subTask);
         manager.add(task);

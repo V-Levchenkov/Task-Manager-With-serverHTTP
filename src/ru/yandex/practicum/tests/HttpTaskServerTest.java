@@ -208,6 +208,7 @@ public class HttpTaskServerTest {
         assertEquals(sendGetRquest("tasks/task").body(), "[]");
 
     }
+
     @Test
     void DeleteEpics() {
         sendPostRequest("task", task);
@@ -215,6 +216,7 @@ public class HttpTaskServerTest {
         sendPostRequest("subtask", subTask11);
         assertEquals(sendGetRquest("tasks/epic").body(), "[]");
     }
+
     @Test
     void DeleteSubTasks() {
         sendPostRequest("task", task);
@@ -222,6 +224,7 @@ public class HttpTaskServerTest {
         sendPostRequest("subtask", subTask11);
         assertEquals(sendGetRquest("tasks/subtask").body(), "[]");
     }
+
     @Test
     void DeleteTask() {
         sendPostRequest("task", task);
@@ -229,6 +232,7 @@ public class HttpTaskServerTest {
         sendPostRequest("subtask", subTask11);
         assertEquals(sendGetRquest("tasks/task/?id=1").body(), "[]");
     }
+
     @Test
     void DeleteSubTask() {
         sendPostRequest("task", task);
@@ -236,6 +240,7 @@ public class HttpTaskServerTest {
         sendPostRequest("subtask", subTask11);
         assertEquals(sendGetRquest("tasks/subtasktask/?id=3").body(), "[]");
     }
+
     @Test
     void DeleteEpic() {
         sendPostRequest("task", task);
