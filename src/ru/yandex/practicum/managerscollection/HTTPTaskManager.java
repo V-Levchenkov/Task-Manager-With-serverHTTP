@@ -21,7 +21,7 @@ public class HTTPTaskManager extends FileBackedTasksManager {
         client = new KvTaskClient(url);
     }
 
-    @Override
+    @Override  //Требуемый метод Save по ТЗ
     public void save() {
         gson = new Gson();
         List<Long> historyList = new ArrayList<>();
