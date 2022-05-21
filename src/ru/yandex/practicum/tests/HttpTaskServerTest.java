@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.managerscollection.Managers;
 import ru.yandex.practicum.managerscollection.interfaces.TaskManager;
 import ru.yandex.practicum.managerscollection.interfaces.TaskStatus;
-import ru.yandex.practicum.servers.HTTPTaskServer;
+import ru.yandex.practicum.servers.HttpTaskServer;
 import ru.yandex.practicum.servers.KVServer;
 import ru.yandex.practicum.tasks.Epic;
 import ru.yandex.practicum.tasks.SubTask;
@@ -23,9 +23,9 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HTTPTaskServerTest {
+public class HttpTaskServerTest {
     private KVServer kvServer;
-    HTTPTaskServer httpTaskServer;
+    HttpTaskServer httpTaskServer;
     private TaskManager manager;
     HttpClient client = HttpClient.newHttpClient();
 
@@ -41,7 +41,7 @@ public class HTTPTaskServerTest {
         kvServer = new KVServer();
         kvServer.start();
         manager = Managers.getDefault();
-        httpTaskServer = new HTTPTaskServer(manager);
+        httpTaskServer = new HttpTaskServer(manager);
         httpTaskServer.start();
     }
 
