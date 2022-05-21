@@ -1,19 +1,20 @@
-package ru.yandex.practicum.tasks;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.managerscollection.InMemoryHistoryManager;
 import ru.yandex.practicum.managerscollection.interfaces.HistoryManager;
+import ru.yandex.practicum.tasks.Epic;
+import ru.yandex.practicum.tasks.SubTask;
+import ru.yandex.practicum.tasks.Task;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 class HistoryManagerTest {
-    Task task;
-    Epic epic;
-    SubTask subTask;
-    HistoryManager manager;
+    private Task task;
+    private Epic epic;
+    private SubTask subTask;
+    private HistoryManager manager;
 
 
     @BeforeEach

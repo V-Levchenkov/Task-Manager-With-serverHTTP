@@ -18,10 +18,6 @@ public class HTTPTaskServer {
         server.createContext("/tasks", new Handler(manager));
     }
 
-    public HTTPTaskServer() {
-
-    }
-
     public void start() {
         server.start();
     }

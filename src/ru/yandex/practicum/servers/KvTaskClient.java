@@ -7,15 +7,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class KvTaskClient {
-    private final String API_KEY;
+    private final String apiKey;
     private final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder();
     private final HttpClient client = HttpClient.newHttpClient();
     private final URI url;
 
     public KvTaskClient(URI url) {
         this.url = url;
-        API_KEY = registerApiKey();
+        apiKey = registerApiKey();
     }
+
 
     public URI getUrl() {
         return url;
@@ -24,14 +25,14 @@ public class KvTaskClient {
     public void put(String key, String json) throws IOException, InterruptedException {
 
         HttpRequest request = requestBuilder.POST(HttpRequest.BodyPublishers.ofString(json))
-                .uri(URI.create(url + "/save/" + key + "?API_KEY=" + API_KEY)).version(HttpClient.Version.HTTP_1_1)
+                .uri(URI.create(url + "/save/" + key + "?API_KEY=" + apiKey)).version(HttpClient.Version.HTTP_1_1)
                 .header("Accept", "application/json")
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     public String load(String key) {
-        HttpRequest request = requestBuilder.GET().uri(URI.create(url + "/load/" + key + "?API_KEY=" + API_KEY)).version(HttpClient.Version.HTTP_1_1)
+        HttpRequest request = requestBuilder.GET().uri(URI.create(url + "/load/" + key + "?API_KEY=" + apiKey)).version(HttpClient.Version.HTTP_1_1)
                 .header("Accept", "application/json")
                 .build();
         HttpResponse<String> response = null;
@@ -44,7 +45,7 @@ public class KvTaskClient {
     }
 
 
-    String registerApiKey() {
+    private String registerApiKey() {
         HttpRequest request = requestBuilder.GET().uri(URI.create(url + "/register")).version(HttpClient.Version.HTTP_1_1)
                 .header("Accept", "application/json")
                 .build();
