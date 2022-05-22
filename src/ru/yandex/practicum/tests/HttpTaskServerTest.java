@@ -25,16 +25,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpTaskServerTest {
     private KVServer kvServer;
-    HttpTaskServer httpTaskServer;
+    private HttpTaskServer httpTaskServer;
     private TaskManager manager;
-    HttpClient client = HttpClient.newHttpClient();
+    private HttpClient client = HttpClient.newHttpClient();
 
-    static Task task;
-    static Epic epic1;
-    static SubTask subTask11;
-    static SubTask subTask12;
-    static Epic epic2;
-    static SubTask subTask21;
+    private static Task task;
+    private static Epic epic1;
+    private static SubTask subTask11;
+    private static SubTask subTask12;
+    private static Epic epic2;
+    private static SubTask subTask21;
 
     @BeforeEach
     void start() throws IOException, URISyntaxException {
@@ -53,13 +53,13 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetTasksWhileEmptyList() {
+    void getTasksWhileEmptyList() {
         String body = sendGetRquest("tasks/task/").body();
         assertEquals(body, "[]");
     }
 
     @Test
-    void GetTasksWhileNotEmptyList() {
+    void getTasksWhileNotEmptyList() {
         String taskJson = "[{\"name\":\"name\",\"description\":\"description\",\"uin\":1,\"status\":\"NEW\"," +
                 "\"duration\":{\"seconds\":3000,\"nanos\":0},\"startTime\":{\"date\":{\"year\":2022,\"month\":4," +
                 "\"day\":17},\"time\":{\"hour\":9,\"minute\":0,\"second\":0,\"nano\":0}}}]";
@@ -69,12 +69,12 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetSubTasksWhileEmptyList() {
+    void getSubTasksWhileEmptyList() {
         assertEquals(sendGetRquest("tasks/subtask/").body(), "[]");
     }
 
     @Test
-    void GetSubTasksWhileNotEmptyList() {
+    void getSubTasksWhileNotEmptyList() {
         Gson gson = new Gson();
         sendPostRequest("subtask", subTask11);
         String subtaskJson = "[" + gson.toJson(manager.getSubTaskById(1)) + "]";
@@ -82,12 +82,12 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetEpicsWhileEmptyList() {
+    void getEpicsWhileEmptyList() {
         assertEquals(sendGetRquest("tasks/subtask/").body(), "[]");
     }
 
     @Test
-    void GetEpicsTaskWhileNotEmptyList() {
+    void getEpicsTaskWhileNotEmptyList() {
         Gson gson = new Gson();
         sendPostRequest("epic", epic1);
         String subtaskJson = "[" + gson.toJson(manager.getEpicById(1)) + "]";
@@ -95,12 +95,12 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetTasksByIdWhileEmptyList() {
+    void getTasksByIdWhileEmptyList() {
         assertEquals(sendGetRquest("tasks/task/?id=1").body(), "");
     }
 
     @Test
-    void GetTasksByIdWhileNotEmptyList() {
+    void getTasksByIdWhileNotEmptyList() {
         sendPostRequest("task", task);
         String string = sendGetRquest("tasks/task/?id=1").body();
         String testString = "{\"name\":\"name\",\"description\":\"description\",\"uin\":1,\"status\":\"NEW\"," +
@@ -111,12 +111,12 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetSubTasksByIdWhileEmptyList() {
+    void getSubTasksByIdWhileEmptyList() {
         assertEquals(sendGetRquest("tasks/subtask/?id=1").body(), "");
     }
 
     @Test
-    void GetSubTasksByIdWhileNotEmptyList() {
+    void getSubTasksByIdWhileNotEmptyList() {
         sendPostRequest("subtask", subTask11);
         String string = sendGetRquest("tasks/subtask/?id=1").body();
         String testString = "{\"epicId\":0,\"name\":\"subTask11Name\",\"description\":\"subTask11Description\"," +
@@ -127,12 +127,12 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetEpicsByIdWhileEmptyList() {
+    void getEpicsByIdWhileEmptyList() {
         assertEquals(sendGetRquest("tasks/epic/?id=1").body(), "");
     }
 
     @Test
-    void GetEpicsByIdWhileNotEmptyList() {
+    void getEpicsByIdWhileNotEmptyList() {
         sendPostRequest("epic", epic1);
         String string = sendGetRquest("tasks/epic/?id=1").body();
         String testString = "{\"subTasks\":[],\"name\":\"epic1Name\",\"description\":\"epic1Description\"," +
@@ -141,12 +141,12 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetHistoryWhileEmpty() {
+    void getHistoryWhileEmpty() {
         assertEquals(sendGetRquest("tasks/history").body(), "[]");
     }
 
     @Test
-    void GetHistory() {
+    void getHistory() {
         sendPostRequest("task", task);
         sendPostRequest("epic", epic1);
         sendPostRequest("subtask", subTask11);
@@ -161,7 +161,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetTasksPriority() {
+    void getTasksPriority() {
         sendPostRequest("task", task);
         String testString = "[{\"name\":\"name\",\"description\":\"description\",\"uin\":1,\"status\":\"NEW\"," +
                 "\"duration\":{\"seconds\":3000,\"nanos\":0},\"startTime\":{\"date\":{\"year\":2022,\"month\":4," +
@@ -170,12 +170,12 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void GetTasksPriorityWhileEmpty() {
+    void getTasksPriorityWhileEmpty() {
         assertEquals(sendGetRquest("tasks").body(), "[]");
     }
 
     @Test
-    void PostTask() {
+    void postTask() {
         Task newtask = cloneTask(task);
         newtask.setTaskId(1);
         sendPostRequest("task", task);
@@ -183,7 +183,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void PostEpic() {
+    void postEpic() {
         Task newtask = cloneEpic(epic1);
         newtask.setTaskId(1);
         newtask.setStatus(TaskStatus.NEW);
@@ -192,7 +192,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void PostSubTask() {
+    void postSubTask() {
         Task newtask = cloneSubTask(subTask11);
         newtask.setTaskId(1);
         sendPostRequest("subtask", subTask11);
@@ -200,7 +200,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void DeleteTasks() {
+    void deleteTasks() {
         sendPostRequest("task", task);
         sendPostRequest("epic", epic1);
         sendPostRequest("subtask", subTask11);
@@ -210,7 +210,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void DeleteEpics() {
+    void deleteEpics() {
         sendPostRequest("task", task);
         sendPostRequest("epic", epic1);
         sendPostRequest("subtask", subTask11);
@@ -218,7 +218,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void DeleteSubTasks() {
+    void deleteSubTasks() {
         sendPostRequest("task", task);
         sendPostRequest("epic", epic1);
         sendPostRequest("subtask", subTask11);
@@ -226,7 +226,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void DeleteTask() {
+    void deleteTask() {
         sendPostRequest("task", task);
         sendPostRequest("epic", epic1);
         sendPostRequest("subtask", subTask11);
@@ -234,7 +234,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void DeleteSubTask() {
+    void deleteSubTask() {
         sendPostRequest("task", task);
         sendPostRequest("epic", epic1);
         sendPostRequest("subtask", subTask11);
@@ -242,7 +242,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void DeleteEpic() {
+    void deleteEpic() {
         sendPostRequest("task", task);
         sendPostRequest("epic", epic1);
         sendPostRequest("subtask", subTask11);
